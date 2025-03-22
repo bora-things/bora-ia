@@ -5,7 +5,7 @@ from fastapi import FastAPI, Query
 from fastapi.responses import RedirectResponse
 from langchain_openai import OpenAIEmbeddings
 
-from rag import get_rag_chain
+from rag.graph import graph
 from feedback_classifier import tagging_chain
 
 from dotenv import load_dotenv
@@ -27,7 +27,8 @@ async def feedback_classify(query: Annotated[str, Query(max_length=ENDPOINT_QUER
 
 @app.get("/ai")
 async def ai(query: Annotated[str, Query(max_length=ENDPOINT_QUERY_AI_MAX_SIZE)]):
-    response = get_rag_chain().invoke({"input": query})
+    response = graph.invoke({"input": query})
+    print(response)
     return response["answer"]
 
 @app.post("/embedding")
