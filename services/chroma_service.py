@@ -17,6 +17,8 @@ from repositories.chroma_repository import ChromaRepository
 load_dotenv()
 
 KNOWLEDGE_PDF_DIR = os.getenv("KNOWLEDGE_PDF_DIR")
+CHROMA_HOST = os.getenv("CHROMA_HOST")
+CHROMA_PORT = int(os.getenv("CHROMA_PORT"))
 
 
 def load_pdfs(pdfs: Iterable[str]) -> list[Document]:
@@ -25,8 +27,8 @@ def load_pdfs(pdfs: Iterable[str]) -> list[Document]:
     :param pdfs: list of filepaths to pdfs files
     :return: list of Documents
     """
+    docs = []
     if pdfs:
-        docs = []
         for pdf_file in pdfs:
             loader = PyMuPDFLoader(pdf_file)
             pages = loader.load()
@@ -35,7 +37,7 @@ def load_pdfs(pdfs: Iterable[str]) -> list[Document]:
                 
             docs.extend(pages)
 
-        return docs
+    return docs
 
 
 def split_docs(docs: list[Document]) -> list[Document]:
@@ -52,8 +54,14 @@ def split_docs(docs: list[Document]) -> list[Document]:
 
 
 class ChromaService:
-    def __init__(self, chroma_repository: ChromaRepository = ChromaRepository(),
-                 knowledge_directory: str = KNOWLEDGE_PDF_DIR):
+    def __init__(
+        self,
+        chroma_repository: ChromaRepository = ChromaRepository(
+            host=CHROMA_HOST,
+            port=CHROMA_PORT,
+        ),
+        knowledge_directory: str = KNOWLEDGE_PDF_DIR
+    ):
         self._chroma_repository = chroma_repository
         self._knowledge_directory = knowledge_directory
 
