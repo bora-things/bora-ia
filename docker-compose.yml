@@ -1,0 +1,39 @@
+services:
+  chroma:
+    image: ghcr.io/chroma-core/chroma:latest
+    container_name: chroma
+    env_file:
+      - ./.env
+    environment:
+      - IS_PERSISTENT=TRUE
+    volumes:
+      - chroma-data:/chroma/chroma
+    ports:
+      - ${CHROMA_PORT}:8000
+    networks:
+      - bora_net
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bora-ia
+    container_name: bora-ia
+    env_file:
+      - ./.env
+    environment:
+      - CHROMA_HOST=${CHROMA_HOST}
+      - CHROMA_PORT=${CHROMA_PORT}
+    depends_on:
+      - chroma
+    networks:
+      - bora_net
+
+networks:
+  bora_net:
+    name: bora_net
+    driver: bridge
+
+volumes:
+  chroma-data:
+    driver: local
